@@ -20,7 +20,7 @@ A Django-based application acting as a REST API and a simple web interface for m
 
 1.  **Clone the repository** (if applicable) or navigate to the project directory:
     ```bash
-    cd d:\code_git\django
+    https://github.com/ARSK-11/django
     ```
 
 2.  **Create and Activate Virtual Environment**:
