@@ -20,8 +20,7 @@ Ikuti langkah-langkah ini secara berurutan mulai dari nol.
 ### Langkah 1: Persiapkan Folder Project
 Buka terminal (Command Prompt/PowerShell) dan arahkan ke folder di mana Anda ingin menyimpan project ini.
 ```bash
-# Contoh jika file ada di d:\code_git\django
-cd d:\code_git\django
+https://github.com/ARSK-11/django
 ```
 
 ### Langkah 2: Buat & Aktifkan Virtual Environment
