@@ -1,0 +1,33 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block page_content %}
+<div id="content-main">
+    <form method="post" id="product_form">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <h2>{{ title }}</h2>
+            {% for field in form %}
+            <div class="form-row">
+                <div>
+                    <label class="required" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </fieldset>
+
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default" name="_save">
+            <a href="{% url 'product_list' %}" class="closelink">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
