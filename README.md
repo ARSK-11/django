@@ -1,115 +1,124 @@
-# Django Product API & Management
+# Django Product Management System
 
-A Django-based application acting as a REST API and a simple web interface for managing product data. It includes a management command to sync data from an external API using dynamic authentication.
+Aplikasi manajemen produk ini dibangun menggunakan **Django** sebagai backend (REST API) dan **PostgreSQL** sebagai database. Aplikasi ini memiliki fitur untuk **sinkronisasi otomatis** dari API eksternal dan tampilan antarmuka web yang bersih.
 
-## Features
+---
 
--   **Data Synchronization**: Fetches product data from an external API with dynamic credentials (Date/Time based).
--   **REST API**: Endpoints for Products, Categories, and Statuses using Django Rest Framework.
--   **Web UI**: Simple, clean Bootstrap interface for CRUD operations.
--   **Validation**: Server-side validation for product names and prices.
--   **PostgreSQL**: Robust database backend.
+## 🛠️ Prasyarat (Prerequisites)
 
-## Prerequisites
+Sebelum memulai, pastikan komputer Anda sudah terinstal:
+1.  **Python 3.10+**: [Download di sini](https://www.python.org/downloads/)
+2.  **PostgreSQL**: [Download di sini](https://www.postgresql.org/download/)
+3.  **Git**: (Opsional) Untuk clone repository.
 
--   Python 3.10+
--   PostgreSQL
--   Git
+---
 
-## Installation
+## 🚀 Panduan Instalasi (Step-by-Step)
 
-1.  **Clone the repository** (if applicable) or navigate to the project directory:
-    ```bash
-    cd d:\code_git\django
-    ```
+Ikuti langkah-langkah ini secara berurutan mulai dari nol.
 
-2.  **Create and Activate Virtual Environment**:
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate  # Windows
-    ```
+### Langkah 1: Persiapkan Folder Project
+Buka terminal (Command Prompt/PowerShell) dan arahkan ke folder di mana Anda ingin menyimpan project ini.
+```bash
+# Contoh jika file ada di d:\code_git\django
+cd d:\code_git\django
+```
 
-3.  **Install Dependencies**:
-    ```bash
-    pip install django djangorestframework psycopg2-binary requests
-    ```
+### Langkah 2: Buat & Aktifkan Virtual Environment
+Virtual environment berguna agar library project tidak tercampur dengan Python sistem.
+```bash
+# 1. Buat virtual environment bernama 'venv'
+python -m venv venv
 
-4.  **Database Configuration**:
-    -   Ensure PostgreSQL is running and you have created a database (e.g., `api_product_db`).
-    -   Open `api_product/settings.py` and locate the `DATABASES` dictionary (around line 77).
-    -   Update the `USER` and `PASSWORD` fields with your PostgreSQL credentials:
-        ```python
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'api_product_db',
-                'USER': 'your_postgres_username',  # e.g., 'postgres'
-                'PASSWORD': 'your_postgres_password', # e.g., 'admin123'
-                'HOST': 'localhost',
-                'PORT': '5432',
-            }
-        }
-        ```
+# 2. Aktifkan virtual environment
+# Untuk Windows:
+venv\Scripts\activate
 
-5.  **Run Migrations**:
-    ```bash
-    python manage.py makemigrations
-    python manage.py migrate
-    ```
+# Untuk Mac/Linux:
+# source venv/bin/activate
+```
+*(Tanda `(venv)` akan muncul di terminal Anda)*
 
-## Data Synchronization & Migration
+### Langkah 3: Install Library
+Install semua dependensi yang dibutuhkan (Django, DRF, Driver Postgres, dll).
+```bash
+pip install django djangorestframework psycopg2-binary requests
+```
 
-The project includes a custom management command to migrate data from the legacy API to the PostgreSQL database.
+### Langkah 4: Konfigurasi Database PostgreSQL
+1.  Buka **pgAdmin** atau terminal PostgreSQL.
+2.  Buat database baru bernama `api_product_db`.
+3.  Buka file project: `d:\code_git\django\api_product\settings.py`.
+4.  Cari bagian `DATABASES` (sekitar baris 77) dan sesuaikan `USER` dan `PASSWORD` dengan milik Anda.
 
-### API Configuration
-The data source is `https://recruitment.fastprint.co.id/tes/api_tes_programmer`.
-Authentication credentials are **generated dynamically** based on the current server time:
--   **Username**: `tesprogrammer` + `ddMMyy` + `C` + `HH` (e.g., `tesprogrammer050226C19`)
--   **Password**: `bisacoding-` + `dd-MM-yy` (MD5 hashed)
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'api_product_db',       # Nama database yang baru dibuat
+           'USER': 'postgres',             # <-- GANTI DENGAN USERNAME ANDA
+           'PASSWORD': 'password_anda',    # <-- GANTI DENGAN PASSWORD ANDA
+           'HOST': 'localhost',
+           'PORT': '5432',
+       }
+   }
+   ```
 
-### Migration Logic (`products/management/commands/sync_products.py`)
-Run the command to start migration:
+### Langkah 5: Jalankan Migrasi
+Langkah ini akan membuat tabel-tabel yang diperlukan di database PostgreSQL Anda.
+```bash
+# Membuat file migrasi
+python manage.py makemigrations
+
+# Menerapkan ke database
+python manage.py migrate
+```
+
+### Langkah 6: Buat Akun Admin (Superuser)
+Akun ini digunakan untuk login ke web dan admin panel.
+```bash
+python manage.py createsuperuser
+```
+*Username: `admin`*
+*Email: (biarkan kosong)*
+*Password: `admin123` (atau sesuai keinginan)*
+
+### Langkah 7: Sinkronisasi Data (PENTING!)
+Jalankan perintah ini untuk mengambil data produk dari API eksternal dan menyimpannya ke database lokal Anda.
 ```bash
 python manage.py sync_products
 ```
+*Script ini akan otomatis login ke API FastPrint menggunakan username/password dinamis dan menyimpan data Produk, Kategori, dan Status.*
 
-**File Location:** `products/management/commands/sync_products.py`
-
-**Process:**
-1.  **Auth**: Generates dynamic credentials and authenticates with the external API.
-2.  **Fetch**: Retrieves the list of products in JSON format.
-3.  **Mapping**:
-    -   **Kategori**: Creating new categories if they don't exist. IDs are generated using a hash of the category name since the API doesn't provide them.
-    -   **Status**: Creating status entries similarly to categories.
-    -   **Produk**: Maps `nama_produk`, `harga`, and links them to the respective `Kategori` and `Status` objects.
-4.  **Idempotency**: Uses `update_or_create` to prevent duplicates. Running the command multiple times will update existing records rather than creating new ones.
-
-## Login Credentials
-
-A superuser has been created for administrative access:
--   **Username**: `admin`
--   **Password**: `admin123`
-
-## Running the Application
-
-Start the development server:
-
+### Langkah 8: Jalankan Aplikasi
+Sekarang server siap dijalankan.
 ```bash
 python manage.py runserver
 ```
 
-Access the application at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+### Langkah 9: Akses Aplikasi
+Buka browser dan kunjungi:
+👉 **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
 
-## API Endpoints
+-   **Halaman Utama**: Daftar Produk (CRUD) dengan tampilan Admin.
+-   **Login**: Klik tombol "Login to Admin" di pojok kanan atas.
+    -   *User: `admin`*
+    -   *Pass: `admin123`*
 
-You can browse the API directly or use tools like Postman:
+---
 
--   **Products**: `/api/produk/`
--   **Categories**: `/api/kategori/`
--   **Status**: `/api/status/`
+## ⚙️ Informasi Teknis
 
-## Project Structure
+### Struktur API Endpoint
+-   List Produk: `/api/produk/`
+-   List Kategori: `/api/kategori/`
+-   List Status: `/api/status/`
 
--   `api_product/`: Main project configuration.
--   `products/`: Main application containing Models, Views, Serializers, and Templates.
--   `products/management/commands/sync_products.py`: Logic for external API synchronization.
+### Logika Sinkronisasi (`sync_products.py`)
+File: `products/management/commands/sync_products.py`
+Script ini menangani autentikasi dinamis (Username format `tesprogrammerDDMMYYC...`) dan pemetaan data JSON ke Model Django.
+
+---
+
+**Selamat Mencoba!**
+Jika terjadi error "TemplateSyntaxError" atau masalah tampilan, pastikan Anda refresh halaman atau restart server.

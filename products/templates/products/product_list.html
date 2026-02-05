@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block page_content %}
-<!-- Template Layout simplified DEBUG MODE -->
 <div class="module" id="changelist">
     <div class="action-row">
         <a href="{% url 'product_create' %}" class="addlink">Add product</a>
@@ -36,7 +35,11 @@
                 {% for product in products %}
                 <tr class="{% cycle 'row1' 'row2' %}">
                     <td class="field-id_produk">{{ product.id_produk }}</td>
-                    <td class="field-nama_produk">{{ product.nama_produk }}</td>
+                    <td class="field-nama_produk">
+                        <a href="{% url 'product_edit' product.pk %}">
+                            {{ product.nama_produk }}
+                        </a>
+                    </td>
                     <td class="field-harga">Rp {{ product.harga|floatformat:0 }}</td>
                     <td class="field-kategori">{{ product.kategori.nama_kategori }}</td>
                     <td class="field-status">
@@ -48,6 +51,8 @@
                         {{ product.status.nama_status }}
                     </td>
                     <td>
+                        <a href="{% url 'product_edit' product.pk %}" class="button"
+                            style="background: #79aec8; padding: 5px 10px; text-decoration: none; color: white; display: inline-block; height: 30px; line-height: 20px; box-sizing: border-box; margin-right: 5px;">Edit</a>
                         <form action="{% url 'product_delete' product.pk %}" method="POST" style="display:inline;"
                             onsubmit="return confirm('Are you sure?');">
                             {% csrf_token %}
